@@ -74,6 +74,30 @@ public class ParserTests {
         Assertions.assertDoesNotThrow(
             () -> Assertions.assertIterableEquals(
                 Parser.parse("""
+                    INSERT INTO test
+                    VALUES (1, true, 'Michael', 'Romashov');
+                """),
+                List.of(
+                    new Query.InsertInto(
+                        new Token.Identifier("test"),
+                        null,
+                        Arrays.asList(
+                            new Token.Literal.Integer(1),
+                            new Token.Literal.Boolean(true),
+                            new Token.Literal.String("Michael"),
+                            new Token.Literal.String("Romashov")
+                        )
+                    )
+                )
+            )
+        );
+    }
+
+    @Test
+    public void parseInsertIntoColumns() {
+        Assertions.assertDoesNotThrow(
+            () -> Assertions.assertIterableEquals(
+                Parser.parse("""
                     INSERT INTO test (id, active, first_name, last_name)
                     VALUES (1, true, 'Michael', 'Romashov');
                 """),

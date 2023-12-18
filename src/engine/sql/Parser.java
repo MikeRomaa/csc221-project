@@ -156,7 +156,7 @@ public class Parser {
         int startIndex = current;
 
         Token.Identifier tableName;
-        List<Token.Identifier> columns = new ArrayList<>();
+        List<Token.Identifier> columns = null;
         List<Token.Literal> values = new ArrayList<>();
 
         if (input.get(current) instanceof Token.Statement(var t1) && t1 == Token.StatementType.INSERT) {
@@ -180,29 +180,29 @@ public class Parser {
 
         if (input.get(current) instanceof Token.Punctuation(var t3) && t3 == Token.PunctuationType.LEFT_PAREN) {
             current++;
-        } else {
-            return null;
-        }
 
-        while (true) {
-            if (input.get(current) instanceof Token.Identifier) {
-                columns.add((Token.Identifier) input.get(current));
+            columns = new ArrayList<>();
+
+            while (true) {
+                if (input.get(current) instanceof Token.Identifier) {
+                    columns.add((Token.Identifier) input.get(current));
+                    current++;
+                } else {
+                    return null;
+                }
+
+                if (input.get(current) instanceof Token.Punctuation(var t5) && t5 == Token.PunctuationType.COMMA) {
+                    current++;
+                } else {
+                    break;
+                }
+            }
+
+            if (input.get(current) instanceof Token.Punctuation(var t6) && t6 == Token.PunctuationType.RIGHT_PAREN) {
                 current++;
             } else {
                 return null;
             }
-
-            if (input.get(current) instanceof Token.Punctuation(var t5) && t5 == Token.PunctuationType.COMMA) {
-                current++;
-            } else {
-                break;
-            }
-        }
-
-        if (input.get(current) instanceof Token.Punctuation(var t6) && t6 == Token.PunctuationType.RIGHT_PAREN) {
-            current++;
-        } else {
-            return null;
         }
 
         if (input.get(current) instanceof Token.Statement(var t7) && t7 == Token.StatementType.VALUES) {
