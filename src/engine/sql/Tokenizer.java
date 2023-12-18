@@ -116,6 +116,8 @@ public class Tokenizer {
             case "SELECT" -> new Token.Statement(Token.StatementType.SELECT);
             case "DELETE" -> new Token.Statement(Token.StatementType.DELETE);
             case "FROM" -> new Token.Statement(Token.StatementType.FROM);
+            case "UPDATE" -> new Token.Statement(Token.StatementType.UPDATE);
+            case "SET" -> new Token.Statement(Token.StatementType.SET);
             case "WHERE" -> new Token.Statement(Token.StatementType.WHERE);
             case "ORDER" -> new Token.Statement(Token.StatementType.ORDER);
             case "BY" -> new Token.Statement(Token.StatementType.BY);

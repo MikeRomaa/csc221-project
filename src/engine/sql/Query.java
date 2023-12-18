@@ -49,4 +49,11 @@ public sealed interface Query {
         Token.Identifier tableName,
         Expression filter
     ) implements Query {}
+
+    record UpdateSet(
+        Token.Identifier tableName,
+        List<Token.Identifier> columns,
+        List<Token.Literal> values,
+        Expression filter
+    ) implements Query {}
 }

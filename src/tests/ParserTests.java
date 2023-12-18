@@ -208,4 +208,33 @@ public class ParserTests {
             )
         );
     }
+
+    @Test
+    public void parseUpdateSet() {
+        Assertions.assertDoesNotThrow(
+            () -> Assertions.assertIterableEquals(
+                Parser.parse("""
+                    UPDATE test
+                    SET active = false
+                    WHERE last_name = 'Romashov';
+                """),
+                List.of(
+                    new Query.UpdateSet(
+                        new Token.Identifier("test"),
+                        List.of(
+                            new Token.Identifier("active")
+                        ),
+                        List.of(
+                            new Token.Literal.Boolean(false)
+                        ),
+                        new Query.Expression.Comparison(
+                            new Token.Identifier("last_name"),
+                            new Token.Operator(Token.OperatorType.ASSIGN),
+                            new Token.Literal.String("Romashov")
+                        )
+                    )
+                )
+            )
+        );
+    }
 }

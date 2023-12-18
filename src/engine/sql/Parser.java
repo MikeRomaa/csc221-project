@@ -454,6 +454,118 @@ public class Parser {
         );
     };
 
+    private static final ParserFn updateSetParser = (input, current) -> {
+        int startIndex = current;
+
+        Token.Identifier tableName;
+        List<Token.Identifier> columns = new ArrayList<>();
+        List<Token.Literal> values = new ArrayList<>();
+        Query.Expression filter = null;
+
+        if (input.get(current) instanceof Token.Statement(var t1) && t1 == Token.StatementType.UPDATE) {
+            current++;
+        } else {
+            return null;
+        }
+
+        if (input.get(current) instanceof Token.Identifier) {
+            tableName = (Token.Identifier) input.get(current);
+            current++;
+        } else {
+            return null;
+        }
+
+        if (input.get(current) instanceof Token.Statement(var t2) && t2 == Token.StatementType.SET) {
+            current++;
+        } else {
+            return null;
+        }
+
+        while (true) {
+            if (input.get(current) instanceof Token.Identifier) {
+                columns.add((Token.Identifier) input.get(current));
+                current++;
+            } else {
+                return null;
+            }
+
+            if (input.get(current) instanceof Token.Operator(var t3) && t3 == Token.OperatorType.ASSIGN) {
+                current++;
+            } else {
+                return null;
+            }
+
+            if (input.get(current) instanceof Token.Literal) {
+                values.add((Token.Literal) input.get(current));
+                current++;
+            } else {
+                return null;
+            }
+
+            if (input.get(current) instanceof Token.Punctuation(var t4) && t4 == Token.PunctuationType.COMMA) {
+                current++;
+            } else {
+                break;
+            }
+        }
+
+        if (input.get(current) instanceof Token.Statement(var t5) && t5 == Token.StatementType.WHERE) {
+            current++;
+
+            while (true) {
+                Token.BinaryOperator operator = null;
+
+                if (filter != null) {
+                    if (input.get(current) instanceof Token.BinaryOperator) {
+                        operator = (Token.BinaryOperator) input.get(current);
+                        current++;
+                    } else {
+                        break;
+                    }
+                }
+
+                Token.Identifier column;
+                Token.Operator comparator;
+                Token.Literal value;
+
+
+                if (input.get(current) instanceof Token.Identifier) {
+                    column = (Token.Identifier) input.get(current);
+                    current++;
+                } else {
+                    return null;
+                }
+
+                if (input.get(current) instanceof Token.Operator) {
+                    comparator = (Token.Operator) input.get(current);
+                    current++;
+                } else {
+                    return null;
+                }
+
+                if (input.get(current) instanceof Token.Literal) {
+                    value = (Token.Literal) input.get(current);
+                    current++;
+                } else {
+                    return null;
+                }
+
+                Query.Expression comparison = new Query.Expression.Comparison(column, comparator, value);
+
+                if (operator == null) {
+                    filter = comparison;
+                } else {
+                    filter = new Query.Expression.Binary(filter, operator, comparison);
+                }
+            }
+        }
+
+        return new ParseResult(
+            current - startIndex,
+            new Query.UpdateSet(tableName, columns, values, filter)
+        );
+    };
+
     private static final ParserFn[] parsers = {
         skipSemicolon,
         showTablesParser,
@@ -462,6 +574,7 @@ public class Parser {
         insertIntoParser,
         selectParser,
         deleteFromParser,
+        updateSetParser,
     };
 
     public static List<Query> parse(String input) {

@@ -21,6 +21,8 @@ public sealed interface Token {
         SELECT,
         DELETE,
         FROM,
+        UPDATE,
+        SET,
         WHERE,
         ORDER,
         BY,
