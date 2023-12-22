@@ -37,8 +37,7 @@ public class Parser {
         int startIndex = current;
 
         Token.Identifier tableName;
-        List<Token.Identifier> columnNames = new ArrayList<>();
-        List<Query.DataType> columnTypes = new ArrayList<>();
+        List<Query.ColumnDefinition> columns = new ArrayList<>();
 
         if (input.get(current) instanceof Token.Statement(var t1) && t1 == Token.StatementType.CREATE) {
             current++;
@@ -66,8 +65,9 @@ public class Parser {
         }
 
         while (true) {
-            if (input.get(current) instanceof Token.Identifier) {
-                columnNames.add((Token.Identifier) input.get(current));
+            String columnName;
+            if (input.get(current) instanceof Token.Identifier(var name)) {
+                columnName = name;
                 current++;
             } else {
                 break;
@@ -84,7 +84,12 @@ public class Parser {
                     }
 
                     if (input.get(current) instanceof Token.Literal.Integer(var length)) {
-                        columnTypes.add(new Query.DataType.VarChar(length));
+                        columns.add(
+                            new Query.ColumnDefinition(
+                                columnName,
+                                new Query.DataType.VarChar(length)
+                            )
+                        );
                         current++;
                     } else {
                         return null;
@@ -96,9 +101,19 @@ public class Parser {
                         return null;
                     }
                 } else if (t8 == Token.DataTypeType.BOOLEAN) {
-                    columnTypes.add(new Query.DataType.Boolean());
+                    columns.add(
+                        new Query.ColumnDefinition(
+                            columnName,
+                            new Query.DataType.Boolean()
+                        )
+                    );
                 } else if (t8 == Token.DataTypeType.INTEGER) {
-                    columnTypes.add(new Query.DataType.Integer());
+                    columns.add(
+                        new Query.ColumnDefinition(
+                            columnName,
+                            new Query.DataType.Integer()
+                        )
+                    );
                 } else {
                     return null;
                 }
@@ -121,7 +136,7 @@ public class Parser {
 
         return new ParseResult(
             current - startIndex,
-            new Query.CreateTable(tableName, columnNames, columnTypes)
+            new Query.CreateTable(tableName, columns)
         );
     };
 
@@ -585,7 +600,13 @@ public class Parser {
 
         outer: while (consumedChars < tokens.size()) {
             for (ParserFn parser : parsers) {
-                ParseResult result = parser.parse(tokens, consumedChars);
+                ParseResult result;
+
+                try {
+                    result = parser.parse(tokens, consumedChars);
+                } catch (IndexOutOfBoundsException err) {
+                    break;
+                }
 
                 if (result != null) {
                     consumedChars += result.length;

@@ -38,16 +38,10 @@ public class ParserTests {
                     new Query.CreateTable(
                         new Token.Identifier("test"),
                         Arrays.asList(
-                            new Token.Identifier("id"),
-                            new Token.Identifier("active"),
-                            new Token.Identifier("first_name"),
-                            new Token.Identifier("last_name")
-                        ),
-                        Arrays.asList(
-                            new Query.DataType.Integer(),
-                            new Query.DataType.Boolean(),
-                            new Query.DataType.VarChar(100),
-                            new Query.DataType.VarChar(100)
+                            new Query.ColumnDefinition("id", new Query.DataType.Integer()),
+                            new Query.ColumnDefinition("active", new Query.DataType.Boolean()),
+                            new Query.ColumnDefinition("first_name", new Query.DataType.VarChar(100)),
+                            new Query.ColumnDefinition("last_name", new Query.DataType.VarChar(100))
                         )
                     )
                 )
@@ -256,6 +250,45 @@ public class ParserTests {
                             new Token.Operator(Token.OperatorType.ASSIGN),
                             new Token.Literal.String("Romashov")
                         )
+                    )
+                )
+            )
+        );
+    }
+
+    @Test
+    public void parseMultipleQueries() {
+        Assertions.assertDoesNotThrow(
+            () -> Assertions.assertIterableEquals(
+                Parser.parse("""
+                    UPDATE test
+                    SET active = false
+                    WHERE last_name = 'Romashov';
+
+                    SELECT * FROM test;
+                """),
+                List.of(
+                    new Query.UpdateSet(
+                        new Token.Identifier("test"),
+                        List.of(
+                            new Token.Identifier("active")
+                        ),
+                        List.of(
+                            new Token.Literal.Boolean(false)
+                        ),
+                        new Query.Expression.Comparison(
+                            new Token.Identifier("last_name"),
+                            new Token.Operator(Token.OperatorType.ASSIGN),
+                            new Token.Literal.String("Romashov")
+                        )
+                    ),
+                    new Query.Select(
+                        new Token.Identifier("test"),
+                        List.of(
+                            new Token.Identifier("*")
+                        ),
+                        null,
+                        null
                     )
                 )
             )

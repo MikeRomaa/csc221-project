@@ -36,7 +36,7 @@ public class Tokenizer {
                 return null;
             }
 
-            while (regex.matcher(input.subSequence(end, end + 1)).matches()) {
+            while (end < input.length() && regex.matcher(input.subSequence(end, end + 1)).matches()) {
                 end++;
             }
 

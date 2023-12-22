@@ -4,13 +4,15 @@ import java.util.List;
 
 
 public sealed interface Query {
-    interface DataType {
+    sealed interface DataType {
         record VarChar(int length) implements DataType {}
         record Integer() implements DataType {}
         record Boolean() implements DataType {}
     }
 
-    interface Expression {
+    record ColumnDefinition(String name, DataType type) {}
+
+    sealed interface Expression {
         record Comparison(Token.Identifier ident, Token.Operator op, Token.Literal value) implements Expression {}
         record Binary(Expression lhs, Token.BinaryOperator op, Expression rhs) implements Expression {}
     }
@@ -24,8 +26,7 @@ public sealed interface Query {
 
     record CreateTable(
         Token.Identifier tableName,
-        List<Token.Identifier> columnNames,
-        List<Query.DataType> columnTypes
+        List<ColumnDefinition> columns
     ) implements Query {}
 
     record DropTable(

@@ -1,6 +1,6 @@
 package tests;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ public class TokenizerTests {
         Assertions.assertDoesNotThrow(
             () -> Assertions.assertIterableEquals(
                 Tokenizer.tokenize("SHOW TABLES;"),
-                Arrays.asList(
+                List.of(
                     new Token.Statement(Token.StatementType.SHOW),
                     new Token.Statement(Token.StatementType.TABLES),
                     new Token.Punctuation(Token.PunctuationType.SEMICOLON)
@@ -35,7 +35,7 @@ public class TokenizerTests {
                         last_name varchar(100),
                     );
                 """),
-                Arrays.asList(
+                List.of(
                     new Token.Statement(Token.StatementType.CREATE),
                     new Token.Statement(Token.StatementType.TABLE),
                     new Token.Identifier("test"),
@@ -82,7 +82,7 @@ public class TokenizerTests {
                     WHERE first_name == 'Michael'
                     AND last_name == 'Romashov';
                 """),
-                Arrays.asList(
+                List.of(
                     new Token.Statement(Token.StatementType.SELECT),
                     new Token.Identifier("*"),
 

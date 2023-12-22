@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="gui.App">
-  <grid id="27dc6" binding="appPanel" layout-manager="GridLayoutManager" row-count="6" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="appPanel" layout-manager="GridLayoutManager" row-count="7" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="20" left="20" bottom="20" right="20"/>
     <constraints>
       <xy x="20" y="20" width="916" height="613"/>
@@ -15,19 +15,21 @@
         <properties>
           <font size="16"/>
           <labelFor value="23b36"/>
-          <text value="Results Table"/>
+          <text value="Results"/>
         </properties>
       </component>
       <scrollpane id="23b36">
         <constraints>
-          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
         <border type="none"/>
         <children>
           <component id="71d47" class="javax.swing.JTable" binding="resultsTable">
             <constraints/>
-            <properties/>
+            <properties>
+              <autoResizeMode value="0"/>
+            </properties>
           </component>
         </children>
       </scrollpane>
@@ -76,6 +78,14 @@
           </grid>
         </constraints>
       </vspacer>
+      <component id="614f" class="javax.swing.JLabel" binding="resultsLabel">
+        <constraints>
+          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
+      </component>
     </children>
   </grid>
 </form>

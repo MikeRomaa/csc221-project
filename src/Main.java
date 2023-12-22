@@ -6,9 +6,8 @@ public class Main {
     public static void main(String[] args) {
         FlatMacDarkLaf.setup();
 
-        App app = new App();
         Database database = new Database();
 
-        app.setTableModel(database.asModel());
+        new App(database);
     }
 }

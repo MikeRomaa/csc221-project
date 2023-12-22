@@ -62,7 +62,7 @@ public sealed interface Token {
 
     record Identifier(String ident) implements Token {}
 
-    interface Literal {
+    sealed interface Literal {
         record String(java.lang.String value) implements Token, Literal {}
         record Integer(int value) implements Token, Literal {}
         record Boolean(boolean value) implements Token, Literal {}
