@@ -1,3 +1,10 @@
+/*
+ * Value v1.0
+ *
+ * Michael Romashov
+ * Dec 22, 2023
+ */
+
 package engine.io;
 
 import engine.db.Database;
@@ -9,7 +16,16 @@ import engine.sql.Query;
 import java.io.*;
 import java.util.List;
 
+/**
+ * Provides methods to serialize and deserialize a database by using SQL commands as a representation of the current state.
+ * This is similar to what tools like `mysqldump` and `pg_dump` do.
+ */
 public class Serde {
+    /**
+     * Serializes a database to equivalent SQL commands.
+     * @param out output writer stream where the script contents will go.
+     * @param database database to dump data from.
+     */
     public static void serialize(BufferedWriter out, Database database) {
         PrintWriter writer = new PrintWriter(out);
 
@@ -46,6 +62,11 @@ public class Serde {
         }
     }
 
+    /**
+     * Constructs a new database from SQL commands.
+     * @param in contents of a SQL script file
+     * @return new database.
+     */
     public static Database deserialize(String in) {
         Database database = new Database();
         List<Query> queries = Parser.parse(in);

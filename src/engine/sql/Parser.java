@@ -1,8 +1,18 @@
+/*
+ * Parser v1.0
+ *
+ * Michael Romashov
+ * Dec 22, 2023
+ */
+
 package engine.sql;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Provides a method to convert a sequence of tokens into a Query variant.
+ */
 public class Parser {
     private record ParseResult(int length, Query query) {}
 
@@ -87,7 +97,7 @@ public class Parser {
                         columns.add(
                             new Query.ColumnDefinition(
                                 columnName,
-                                new Query.DataType.VarChar(length)
+                                new DataType.VarChar(length)
                             )
                         );
                         current++;
@@ -104,14 +114,14 @@ public class Parser {
                     columns.add(
                         new Query.ColumnDefinition(
                             columnName,
-                            new Query.DataType.Boolean()
+                            new DataType.Boolean()
                         )
                     );
                 } else if (t8 == Token.DataTypeType.INTEGER) {
                     columns.add(
                         new Query.ColumnDefinition(
                             columnName,
-                            new Query.DataType.Integer()
+                            new DataType.Integer()
                         )
                     );
                 } else {
@@ -264,7 +274,7 @@ public class Parser {
 
         Token.Identifier tableName;
         List<Token.Identifier> columns = new ArrayList<>();
-        Query.Expression filter = null;
+        Expression filter = null;
         Query.OrderBy order = null;
 
         if (input.get(current) instanceof Token.Statement(var t1) && t1 == Token.StatementType.SELECT) {
@@ -342,12 +352,12 @@ public class Parser {
                     return null;
                 }
 
-                Query.Expression comparison = new Query.Expression.Comparison(column, comparator, value);
+                Expression comparison = new Expression.Comparison(column, comparator, value);
 
                 if (operator == null) {
                     filter = comparison;
                 } else {
-                    filter = new Query.Expression.Binary(filter, operator, comparison);
+                    filter = new Expression.Binary(filter, operator, comparison);
                 }
             }
         }
@@ -389,7 +399,7 @@ public class Parser {
         int startIndex = current;
 
         Token.Identifier tableName;
-        Query.Expression filter = null;
+        Expression filter = null;
 
         if (input.get(current) instanceof Token.Statement(var t1) && t1 == Token.StatementType.DELETE) {
             current++;
@@ -454,12 +464,12 @@ public class Parser {
                 return null;
             }
 
-            Query.Expression comparison = new Query.Expression.Comparison(column, comparator, value);
+            Expression comparison = new Expression.Comparison(column, comparator, value);
 
             if (operator == null) {
                 filter = comparison;
             } else {
-                filter = new Query.Expression.Binary(filter, operator, comparison);
+                filter = new Expression.Binary(filter, operator, comparison);
             }
         }
 
@@ -475,7 +485,7 @@ public class Parser {
         Token.Identifier tableName;
         List<Token.Identifier> columns = new ArrayList<>();
         List<Token.Literal> values = new ArrayList<>();
-        Query.Expression filter = null;
+        Expression filter = null;
 
         if (input.get(current) instanceof Token.Statement(var t1) && t1 == Token.StatementType.UPDATE) {
             current++;
@@ -565,12 +575,12 @@ public class Parser {
                     return null;
                 }
 
-                Query.Expression comparison = new Query.Expression.Comparison(column, comparator, value);
+                Expression comparison = new Expression.Comparison(column, comparator, value);
 
                 if (operator == null) {
                     filter = comparison;
                 } else {
-                    filter = new Query.Expression.Binary(filter, operator, comparison);
+                    filter = new Expression.Binary(filter, operator, comparison);
                 }
             }
         }

@@ -1,3 +1,10 @@
+/*
+ * Database v1.0
+ *
+ * Michael Romashov
+ * Dec 22, 2023
+ */
+
 package engine.db;
 
 import engine.sql.Query;
@@ -10,6 +17,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
+/**
+ * Represents the current state of the database and provides an interface for queries to be made through.
+ */
 public class Database {
     private List<Table> tables;
 
@@ -17,10 +27,19 @@ public class Database {
         this.tables = new ArrayList<>(1);
     }
 
+    /**
+     * Overwrites tables in current database with tables from another database.
+     * @param other database to copy tables from.
+     */
     public void copyFrom(Database other) {
         this.tables = other.tables;
     }
 
+    /**
+     * Retrieves a table with the given name.
+     * @param tableName name of table to retrieve.
+     * @throws NoSuchElementException if the table does not exist.
+     */
     private Table getTable(String tableName) throws NoSuchElementException {
         return this.tables
             .stream()
@@ -33,6 +52,10 @@ public class Database {
         return tables;
     }
 
+    /**
+     * Used to make queries with {@link Query.ShowTables}.
+     * @return result set with a single column "tables" with table names as individual rows.
+     */
     private TableModel showTables() {
         return new DefaultTableModel(
             this.tables
@@ -43,11 +66,14 @@ public class Database {
         );
     }
 
+    /**
+     * Used to make queries with {@link Query.CreateTable}.
+     * @return empty result set.
+     */
     private TableModel createTable(Query.CreateTable query) throws RuntimeException {
         String tableName = query.tableName().ident();
 
-        if (
-            this.tables
+        if (this.tables
                 .stream()
                 .anyMatch((table) -> table.getName().equals(tableName))
         ) {
@@ -65,6 +91,10 @@ public class Database {
         return null;
     }
 
+    /**
+     * Used to make queries with {@link Query.DropTable}.
+     * @return empty result set.
+     */
     private TableModel dropTable(Query.DropTable query) throws NoSuchElementException {
         Table table = getTable(query.tableName().ident());
         this.tables.remove(table);
@@ -72,6 +102,10 @@ public class Database {
         return null;
     }
 
+    /**
+     * Used to make queries with {@link Query.InsertInto}.
+     * @return empty result set.
+     */
     private TableModel insertInto(Query.InsertInto query) throws NoSuchElementException {
         Table table = getTable(query.tableName().ident());
         table.insertRow(query.columns(), query.values());
@@ -79,39 +113,70 @@ public class Database {
         return null;
     }
 
+    /**
+     * Used to make queries with {@link Query.Select}.
+     * @return result set with requested columns and (optionally filtered & ordered) data.
+     */
     private TableModel select(Query.Select query) throws NoSuchElementException {
         Table table = getTable(query.tableName().ident());
 
-        Stream<List<Value>> filteredData = table.filterData(query.columns(), query.filter(), query.order());
+        Stream<List<Value>> filteredData = table.filterData(
+            query.columns(),
+            query.filter(),
+            query.order()
+        );
 
+        // Determines which column names should be returned in the result set
         Stream<String> columnNames;
         if (query.columns().contains(new Token.Identifier("*"))) {
             columnNames = table.getColumnNames();
         } else {
-            columnNames = query.columns().stream().map(Token.Identifier::ident);
+            columnNames = query.columns()
+                .stream()
+                .map(Token.Identifier::ident);
         }
 
         return new DefaultTableModel(
             filteredData
+                // Calls .toString() on each datum and casts row to String array
                 .map(row -> row.stream().map(Object::toString).toArray(String[]::new))
+                // Collects each row into an array of String arrays
                 .toArray(String[][]::new),
             columnNames.toArray(String[]::new)
         );
     }
 
+    /**
+     * Used to make queries with {@link Query.DeleteFrom}.
+     * @return empty result set.
+     */
     private TableModel deleteFrom(Query.DeleteFrom query) throws NoSuchElementException {
         Table table = getTable(query.tableName().ident());
 
+        // TODO: Write query processor
+
         return null;
     }
 
+    /**
+     * Used to make queries with {@link Query.UpdateSet}.
+     * @return empty result set.
+     */
     private TableModel updateSet(Query.UpdateSet query) throws NoSuchElementException {
         Table table = getTable(query.tableName().ident());
 
+        // TODO: Write query processor
+
         return null;
     }
 
-    public TableModel executeQuery(Query query) throws RuntimeException {
+    /**
+     * Entrypoint for making queries to the database. Performs pattern matching on the {@link Query} record interface.
+     * @param query query to be made
+     * @return result set to be displayed on the UI
+     * @throws NoSuchElementException if a query had invalid arguments
+     */
+    public TableModel executeQuery(Query query) throws NoSuchElementException {
         return switch (query) {
             case Query.ShowTables  q -> showTables();
             case Query.CreateTable q -> createTable(q);

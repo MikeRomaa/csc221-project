@@ -1,9 +1,19 @@
+/*
+ * Tokenizer v1.0
+ *
+ * Michael Romashov
+ * Dec 22, 2023
+ */
+
 package engine.sql;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Provides a method to convert a raw SQL string into a sequence of tokens that can be interpreted by the Parser.
+ */
 public class Tokenizer {
     private record TokenizeResult(int length, Token token) {}
 
@@ -32,16 +42,18 @@ public class Tokenizer {
         return (input, current) -> {
             int end = current;
 
+            // If the current character doesn't match, we already know the rest won't.
             if (!regex.matcher(input.subSequence(end, end + 1)).matches()) {
                 return null;
             }
 
+            // Keep consuming characters that match the regex pattern.
             while (end < input.length() && regex.matcher(input.subSequence(end, end + 1)).matches()) {
                 end++;
             }
 
+            // Attempt to resolve the consumed characters.
             Token resolvedToken = resolver.resolve(input.substring(current, end));
-
             if (resolvedToken == null) {
                 return null;
             }
@@ -228,6 +240,7 @@ public class Tokenizer {
                 }
             }
 
+            // All tokenizers have been tried and none of them consumed any characters.
             throw new IllegalArgumentException("Could not tokenize input string.");
         }
 

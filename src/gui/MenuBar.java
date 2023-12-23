@@ -41,6 +41,12 @@ public class MenuBar extends JMenuBar {
         exportItem.addActionListener((e) -> {
             if (this.fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File file = this.fileChooser.getSelectedFile();
+
+                // Make sure we have the correct extension
+                if (!file.getPath().endsWith(".sql")) {
+                    file = new File(file.getPath() + ".sql");
+                }
+
                 try {
                     BufferedWriter fileWriter = new BufferedWriter(new FileWriter(file));
                     Serde.serialize(fileWriter, this.database);
@@ -49,6 +55,8 @@ public class MenuBar extends JMenuBar {
                     this.resultsLabel.setForeground(Color.decode("#ff453a"));
                     this.resultsLabel.setText("Unable to export database.");
                 }
+
+                // Display success status message
                 this.resultsLabel.setForeground(Color.decode("#32d74b"));
                 this.resultsLabel.setText("Successfully exported database.");
             }
@@ -61,6 +69,7 @@ public class MenuBar extends JMenuBar {
         importItem.addActionListener((e) -> {
             if (this.fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File file = this.fileChooser.getSelectedFile();
+
                 try {
                     String contents = Files.readString(Paths.get(file.getPath()));
                     this.database.copyFrom(Serde.deserialize(contents));
@@ -68,6 +77,8 @@ public class MenuBar extends JMenuBar {
                     this.resultsLabel.setForeground(Color.decode("#ff453a"));
                     this.resultsLabel.setText("Unable to import database.");
                 }
+
+                // Display success status message
                 this.resultsLabel.setForeground(Color.decode("#32d74b"));
                 this.resultsLabel.setText("Successfully imported database.");
             }

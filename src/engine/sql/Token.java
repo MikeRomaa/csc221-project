@@ -1,5 +1,25 @@
+/*
+ * Token v1.0
+ *
+ * Michael Romashov
+ * Dec 22, 2023
+ */
+
 package engine.sql;
 
+/**
+ * Algebraic data type that represents a token in a SQL query. Has the following variants:
+ *  - Punctuation
+ *  - Statement
+ *  - Operator
+ *  - BinaryOperator
+ *  - SortOrder
+ *  - DataType
+ *  - Identifier
+ *  - Literal.String
+ *  - Literal.Integer
+ *  - Literal.Boolean
+ */
 public sealed interface Token {
     enum PunctuationType {
         LEFT_PAREN,

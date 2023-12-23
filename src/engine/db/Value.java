@@ -1,11 +1,47 @@
+/*
+ * Value v1.0
+ *
+ * Michael Romashov
+ * Dec 22, 2023
+ */
+
 package engine.db;
 
 import engine.sql.Token;
 
+/**
+ * Algebraic data type that represents a value stored in the database. Also provides methods for comparison.
+ * Has the following variants:
+ *  - VarChar
+ *  - Integer
+ *  - Boolean
+ */
 public sealed interface Value {
+    /**
+     * Returns true if the value is the same as the literal, false otherwise.
+     * @throws IllegalArgumentException if the types of the value and literal do not match.
+     */
     boolean equals(Token.Literal rhs) throws IllegalArgumentException;
+
+    /**
+     * Returns true if the value is smaller than the literal, false otherwise.
+     * @throws IllegalArgumentException if the types of the value and literal do not match.
+     */
     boolean lessThan(Token.Literal rhs) throws IllegalArgumentException;
+
+    /**
+     * Returns true if the value is greater than the literal, false otherwise.
+     * @throws IllegalArgumentException if the types of the value and literal do not match.
+     */
     boolean greaterThan(Token.Literal rhs) throws IllegalArgumentException;
+
+    /**
+     * Returns a relative order with another value.
+     * - if 0, values are equal
+     * - if < 0, other value is greater
+     * - if > 0, other value is smaller
+     * @throws IllegalArgumentException if the types of the value and literal do not match.
+     */
     int compareTo(Value rhs) throws IllegalArgumentException;
 
     record VarChar(String value) implements Value {

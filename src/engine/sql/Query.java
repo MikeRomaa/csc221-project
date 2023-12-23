@@ -1,36 +1,26 @@
+/*
+ * Query v1.0
+ *
+ * Michael Romashov
+ * Dec 22, 2023
+ */
+
 package engine.sql;
 
 import java.util.List;
 
-
+/**
+ * Algebraic data type that represents a SQL query. Has the following variants.
+ *  - ShowTables
+ *  - CreateTable
+ *  - DropTable
+ *  - InsertInto
+ *  - Select
+ *  - DeleteFrom
+ *  - UpdateSet
+ */
 public sealed interface Query {
-    sealed interface DataType {
-        record VarChar(int length) implements DataType {
-            @Override
-            public String toString() {
-                return String.format("varchar(%d)", length);
-            }
-        }
-        record Integer() implements DataType {
-            @Override
-            public String toString() {
-                return "integer";
-            }
-        }
-        record Boolean() implements DataType {
-            @Override
-            public String toString() {
-                return "boolean";
-            }
-        }
-    }
-
     record ColumnDefinition(String name, DataType type) {}
-
-    sealed interface Expression {
-        record Comparison(Token.Identifier ident, Token.Operator op, Token.Literal value) implements Expression {}
-        record Binary(Expression lhs, Token.BinaryOperator op, Expression rhs) implements Expression {}
-    }
 
     record OrderBy(
         Token.Identifier column,
