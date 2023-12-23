@@ -1,8 +1,6 @@
 package tests;
 
-import engine.sql.Parser;
-import engine.sql.Query;
-import engine.sql.Token;
+import engine.sql.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -38,10 +36,10 @@ public class ParserTests {
                     new Query.CreateTable(
                         new Token.Identifier("test"),
                         Arrays.asList(
-                            new Query.ColumnDefinition("id", new Query.DataType.Integer()),
-                            new Query.ColumnDefinition("active", new Query.DataType.Boolean()),
-                            new Query.ColumnDefinition("first_name", new Query.DataType.VarChar(100)),
-                            new Query.ColumnDefinition("last_name", new Query.DataType.VarChar(100))
+                            new Query.ColumnDefinition("id", new DataType.Integer()),
+                            new Query.ColumnDefinition("active", new DataType.Boolean()),
+                            new Query.ColumnDefinition("first_name", new DataType.VarChar(100)),
+                            new Query.ColumnDefinition("last_name", new DataType.VarChar(100))
                         )
                     )
                 )
@@ -159,7 +157,7 @@ public class ParserTests {
                             new Token.Identifier("first_name"),
                             new Token.Identifier("last_name")
                         ),
-                        new Query.Expression.Comparison(
+                        new Expression.Comparison(
                             new Token.Identifier("last_name"),
                             new Token.Operator(Token.OperatorType.ASSIGN),
                             new Token.Literal.String("Romashov")
@@ -190,7 +188,7 @@ public class ParserTests {
                             new Token.Identifier("first_name"),
                             new Token.Identifier("last_name")
                         ),
-                        new Query.Expression.Comparison(
+                        new Expression.Comparison(
                             new Token.Identifier("last_name"),
                             new Token.Operator(Token.OperatorType.ASSIGN),
                             new Token.Literal.String("Romashov")
@@ -216,7 +214,7 @@ public class ParserTests {
                 List.of(
                     new Query.DeleteFrom(
                         new Token.Identifier("test"),
-                        new Query.Expression.Comparison(
+                        new Expression.Comparison(
                             new Token.Identifier("last_name"),
                             new Token.Operator(Token.OperatorType.ASSIGN),
                             new Token.Literal.String("Romashov")
@@ -245,7 +243,7 @@ public class ParserTests {
                         List.of(
                             new Token.Literal.Boolean(false)
                         ),
-                        new Query.Expression.Comparison(
+                        new Expression.Comparison(
                             new Token.Identifier("last_name"),
                             new Token.Operator(Token.OperatorType.ASSIGN),
                             new Token.Literal.String("Romashov")
@@ -276,7 +274,7 @@ public class ParserTests {
                         List.of(
                             new Token.Literal.Boolean(false)
                         ),
-                        new Query.Expression.Comparison(
+                        new Expression.Comparison(
                             new Token.Identifier("last_name"),
                             new Token.Operator(Token.OperatorType.ASSIGN),
                             new Token.Literal.String("Romashov")
