@@ -5,9 +5,24 @@ import java.util.List;
 
 public sealed interface Query {
     sealed interface DataType {
-        record VarChar(int length) implements DataType {}
-        record Integer() implements DataType {}
-        record Boolean() implements DataType {}
+        record VarChar(int length) implements DataType {
+            @Override
+            public String toString() {
+                return String.format("varchar(%d)", length);
+            }
+        }
+        record Integer() implements DataType {
+            @Override
+            public String toString() {
+                return "integer";
+            }
+        }
+        record Boolean() implements DataType {
+            @Override
+            public String toString() {
+                return "boolean";
+            }
+        }
     }
 
     record ColumnDefinition(String name, DataType type) {}

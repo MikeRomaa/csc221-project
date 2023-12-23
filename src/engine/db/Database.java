@@ -11,10 +11,14 @@ import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 public class Database {
-    private final List<Table> tables;
+    private List<Table> tables;
 
     public Database() {
         this.tables = new ArrayList<>(1);
+    }
+
+    public void copyFrom(Database other) {
+        this.tables = other.tables;
     }
 
     private Table getTable(String tableName) throws NoSuchElementException {
@@ -23,6 +27,10 @@ public class Database {
             .filter((t) -> t.getName().equals(tableName))
             .findFirst()
             .orElseThrow(() -> new NoSuchElementException(String.format("Table with name '%s' does not exist.", tableName)));
+    }
+
+    public List<Table> getTables() {
+        return tables;
     }
 
     private TableModel showTables() {
@@ -74,7 +82,7 @@ public class Database {
     private TableModel select(Query.Select query) throws NoSuchElementException {
         Table table = getTable(query.tableName().ident());
 
-        Stream<List<Value>> filteredData = table.getData(query.columns(), query.filter(), query.order());
+        Stream<List<Value>> filteredData = table.filterData(query.columns(), query.filter(), query.order());
 
         Stream<String> columnNames;
         if (query.columns().contains(new Token.Identifier("*"))) {

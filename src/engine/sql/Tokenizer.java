@@ -59,6 +59,12 @@ public class Tokenizer {
             : null
     );
 
+    private static final TokenizerFn skipComments = (input, current) -> (
+        input.startsWith("--", current)
+            ? new TokenizeResult(input.indexOf('\n', current) - current, null)
+            : null
+    );
+
     /**
      * Consumes one character and yields corresponding `Token.Punctuation` object
      * if the current character is one of four valid punctuation symbols { ( ) , ; }.
@@ -188,6 +194,7 @@ public class Tokenizer {
 
     private static final TokenizerFn[] tokenizers = {
         skipWhitespace,
+        skipComments,
         punctuationTokenizer,
         operatorTokenizer,
         keywordTokenizer,

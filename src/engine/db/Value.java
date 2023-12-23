@@ -9,6 +9,7 @@ public sealed interface Value {
     int compareTo(Value rhs) throws IllegalArgumentException;
 
     record VarChar(String value) implements Value {
+        @Override
         public String toString() {
             return value;
         }
@@ -43,6 +44,7 @@ public sealed interface Value {
     }
 
     record Integer(int value) implements Value {
+        @Override
         public String toString() {
             return String.valueOf(value);
         }
@@ -77,6 +79,7 @@ public sealed interface Value {
     }
 
     record Boolean(boolean value) implements Value {
+        @Override
         public String toString() {
             return String.valueOf(value);
         }

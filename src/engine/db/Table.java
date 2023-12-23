@@ -27,10 +27,18 @@ public class Table {
         return name;
     }
 
+    public List<Query.ColumnDefinition> getColumns() {
+        return columns;
+    }
+
     public Stream<String> getColumnNames() {
         return this.columns
             .stream()
             .map(Query.ColumnDefinition::name);
+    }
+
+    public List<List<Value>> getData() {
+        return data;
     }
 
     private boolean recursiveFilter(List<Value> row, Query.Expression filter) {
@@ -55,7 +63,7 @@ public class Table {
         };
     }
 
-    public Stream<List<Value>> getData(List<Token.Identifier> selectColumns, Query.Expression filter, Query.OrderBy order) {
+    public Stream<List<Value>> filterData(List<Token.Identifier> selectColumns, Query.Expression filter, Query.OrderBy order) {
         Stream<List<Value>> selectedData = this.data.stream();
 
         if (filter != null) {
@@ -91,10 +99,12 @@ public class Table {
     }
 
     public void insertRow(List<Token.Identifier> insertColumns, List<Token.Literal> values) throws IllegalArgumentException {
-        // Verify that all inserted columns exist in the table.
-        for (Token.Identifier column : insertColumns) {
-            if (!columnIndices.containsKey(column.ident())) {
-                throw new IllegalArgumentException(String.format("Column '%s' does not exist in table '%s'.", column.ident(), this.name));
+        if (insertColumns != null) {
+            // Verify that all inserted columns exist in the table.
+            for (Token.Identifier column : insertColumns) {
+                if (!columnIndices.containsKey(column.ident())) {
+                    throw new IllegalArgumentException(String.format("Column '%s' does not exist in table '%s'.", column.ident(), this.name));
+                }
             }
         }
 
@@ -103,7 +113,7 @@ public class Table {
         int currentValueIndex = 0;
         for (Query.ColumnDefinition column : this.columns) {
             // Check if the current column is next in our input data
-            if (column.name().equals(insertColumns.get(currentValueIndex).ident())) {
+            if (insertColumns == null || column.name().equals(insertColumns.get(currentValueIndex).ident())) {
                 // Check to make sure the value type matches and wrap our literal with the respective value type.
                 Value value = switch (column.type()) {
                     case Query.DataType.VarChar(var maxLength) -> switch (values.get(currentValueIndex)) {

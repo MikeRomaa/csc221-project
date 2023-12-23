@@ -17,11 +17,10 @@ public class App extends JFrame {
     private JLabel resultsLabel;
 
     public App(Database database) {
-        setContentPane(appPanel);
-        setTitle("Database");
-        setSize(1200, 900);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setVisible(true);
+        ImageIcon databaseIcon = new ImageIcon(getClass().getClassLoader().getResource("images/database-zap.png"));
+
+        JMenuBar menuBar = new MenuBar(database, resultsLabel);
+        setJMenuBar(menuBar);
 
         executeButton.addActionListener((e) -> {
             List<Query> queries;
@@ -61,5 +60,12 @@ public class App extends JFrame {
                 resultsTable.removeAll();
             }
         });
+
+        setContentPane(appPanel);
+        setIconImage(databaseIcon.getImage());
+        setTitle("Database");
+        setSize(1200, 900);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setVisible(true);
     }
 }
