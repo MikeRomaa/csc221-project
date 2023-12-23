@@ -152,8 +152,7 @@ public class Database {
      */
     private TableModel deleteFrom(Query.DeleteFrom query) throws NoSuchElementException {
         Table table = getTable(query.tableName().ident());
-
-        // TODO: Write query processor
+        table.deleteRows(query.filter());
 
         return null;
     }
@@ -164,8 +163,11 @@ public class Database {
      */
     private TableModel updateSet(Query.UpdateSet query) throws NoSuchElementException {
         Table table = getTable(query.tableName().ident());
-
-        // TODO: Write query processor
+        table.updateRows(
+            query.columns(),
+            query.values(),
+            query.filter()
+        );
 
         return null;
     }

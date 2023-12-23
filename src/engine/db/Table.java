@@ -188,4 +188,60 @@ public class Table {
 
         this.data.add(row);
     }
+
+    /**
+     * Removes rows that match the provided filter.
+     * @param filter rows to remove.
+     */
+    public void deleteRows(Expression filter) {
+        this.data.removeIf((row) -> recursiveFilter(row, filter));
+    }
+
+    public void updateRows(List<Token.Identifier> updateColumns, List<Token.Literal> values, Expression filter) throws IllegalArgumentException {
+        Stream<List<Value>> selectedData = this.data.stream();
+
+        // Apply filters, if applicable
+        if (filter != null) {
+            selectedData = selectedData.filter((row) -> recursiveFilter(row, filter));
+        }
+
+        // Verify that all updated columns exist in the table.
+        for (Token.Identifier column : updateColumns) {
+            if (!columnIndices.containsKey(column.ident())) {
+                throw new IllegalArgumentException(String.format("Column '%s' does not exist in table '%s'.", column.ident(), this.name));
+            }
+        }
+
+        selectedData.forEach((row) -> {
+            for (int i = 0; i < updateColumns.size(); i++) {
+                int columnIndex = this.columnIndices.get(updateColumns.get(i).ident());
+                Query.ColumnDefinition column = this.columns.get(columnIndex);
+
+                Value value = switch (column.type()) {
+                    case DataType.VarChar(var maxLength) -> switch (values.get(i)) {
+                        case Token.Literal.String(var s) -> {
+                            if (s.length() > maxLength) {
+                                throw new IllegalArgumentException(String.format("String exceeds maximum field length (%s > %s)", s.length(), maxLength));
+                            }
+                            yield new Value.VarChar(s);
+                        }
+                        case Token.Literal.Integer ignored -> throw new IllegalArgumentException(String.format("Attempted to write integer value to varchar column '%s'", column.name()));
+                        case Token.Literal.Boolean ignored -> throw new IllegalArgumentException(String.format("Attempted to write boolean value to varchar column '%s'", column.name()));
+                    };
+                    case DataType.Integer() -> switch (values.get(i)) {
+                        case Token.Literal.Integer(var v) -> new Value.Integer(v);
+                        case Token.Literal.String ignored -> throw new IllegalArgumentException(String.format("Attempted to write string value to integer column '%s'", column.name()));
+                        case Token.Literal.Boolean ignored -> throw new IllegalArgumentException(String.format("Attempted to write boolean value to integer column '%s'", column.name()));
+                    };
+                    case DataType.Boolean() -> switch (values.get(i)) {
+                        case Token.Literal.Boolean(var b) -> new Value.Boolean(b);
+                        case Token.Literal.String ignored -> throw new IllegalArgumentException(String.format("Attempted to write string value to boolean column '%s'", column.name()));
+                        case Token.Literal.Integer ignored -> throw new IllegalArgumentException(String.format("Attempted to write integer value to boolean column '%s'", column.name()));
+                    };
+                };
+
+                row.set(columnIndex, value);
+            }
+        });
+    }
 }
