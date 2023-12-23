@@ -16,10 +16,17 @@ import java.util.List;
 public class Parser {
     private record ParseResult(int length, Query query) {}
 
+    /**
+     * Represents a closure that takes the input token sequence and current index
+     * and attempts to consume part of the sequence.
+     */
     private interface ParserFn {
         ParseResult parse(List<Token> input, int current);
     }
 
+    /**
+     * Consumes one token and yields nothing if the current token is a semicolon.
+     */
     private static final ParserFn skipSemicolon = (input, current) -> (
         input.get(current) instanceof Token.Punctuation token
             && token.type() == Token.PunctuationType.SEMICOLON
@@ -27,6 +34,9 @@ public class Parser {
             : null
     );
 
+    /**
+     * Attempts to consume tokens to construct {@link Query.ShowTables}.
+     */
     private static final ParserFn showTablesParser = (input, current) -> {
         if (input.get(current) instanceof Token.Statement(var t1) && t1 == Token.StatementType.SHOW) {
             current++;
@@ -43,6 +53,9 @@ public class Parser {
         return new ParseResult(2, new Query.ShowTables());
     };
 
+    /**
+     * Attempts to consume tokens to construct {@link Query.CreateTable}.
+     */
     private static final ParserFn createTableParser = (input, current) -> {
         int startIndex = current;
 
@@ -150,6 +163,9 @@ public class Parser {
         );
     };
 
+    /**
+     * Attempts to consume tokens to construct {@link Query.DropTable}.
+     */
     private static final ParserFn dropTableParser = (input, current) -> {
         Token.Identifier tableName;
 
@@ -177,6 +193,9 @@ public class Parser {
         );
     };
 
+    /**
+     * Attempts to consume tokens to construct {@link Query.InsertInto}.
+     */
     private static final ParserFn insertIntoParser = (input, current) -> {
         int startIndex = current;
 
@@ -269,6 +288,9 @@ public class Parser {
         );
     };
 
+    /**
+     * Attempts to consume tokens to construct {@link Query.Select}.
+     */
     private static final ParserFn selectParser = (input, current) -> {
         int startIndex = current;
 
@@ -395,6 +417,9 @@ public class Parser {
         );
     };
 
+    /**
+     * Attempts to consume tokens to construct {@link Query.DeleteFrom}.
+     */
     private static final ParserFn deleteFromParser = (input, current) -> {
         int startIndex = current;
 
@@ -479,6 +504,9 @@ public class Parser {
         );
     };
 
+    /**
+     * Attempts to consume tokens to construct {@link Query.UpdateSet}.
+     */
     private static final ParserFn updateSetParser = (input, current) -> {
         int startIndex = current;
 
@@ -602,6 +630,13 @@ public class Parser {
         updateSetParser,
     };
 
+    /**
+     * Continually loops through all `parsers` until either:
+     *   1. the input token stream is empty, in which case the string has been successfully parsed; or,
+     *   2. all parsers have been exhausted, in which case the string is not valid and an `IllegalArgumentException` is thrown.
+     * @param input string to tokenize
+     * @return list of tokens extracted from the input string
+     */
     public static List<Query> parse(String input) {
         List<Token> tokens = Tokenizer.tokenize(input);
 
@@ -627,6 +662,7 @@ public class Parser {
                 }
             }
 
+            // All parsers have been tried and none of them consumed any tokens.
             throw new IllegalArgumentException("Could not parse input string.");
         }
 
